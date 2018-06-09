@@ -1,10 +1,14 @@
 package com.prashant.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prashant.model.IpConfigDTO;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author prashant sabnekar
@@ -29,6 +33,26 @@ public class IPMonitoringService {
         return true;
     }
 
+    public boolean isValidConfiguration(String ipConfig) {
+        boolean result = false;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode root = mapper.readTree(ipConfig);
+            String ip = root.get("ip").asText();
+           // System.out.println("ip = " + ip);
+            //String tokens[] = ip.split(".");
+            if(null != ip) {
+                result = true;
+            }
+
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+
+
+        return result;
+    }
+
     public void persist(IpConfigDTO config) {
         ipConfigs.put(config.getIp(), config);
     }
@@ -36,7 +60,9 @@ public class IPMonitoringService {
     public void persist(String ipAddress) {
         IpConfigDTO config = new IpConfigDTO();
         config.setIp(ipAddress);
+        config.setConfig("Default Configuration");
         ipConfigs.put(ipAddress, config);
+
     }
 
     public void delete(String ipAddress) {
@@ -44,6 +70,13 @@ public class IPMonitoringService {
             ipConfigs.remove(ipAddress);
         }
     }
+
+    public void deleteIpConfig(IpConfigDTO ipConfig) {
+        if(ipConfigs.containsKey(ipConfig.getIp())) {
+            ipConfigs.remove(ipConfig.getIp());
+        }
+    }
+
 
     public String isIpPresent(String ipAddress) {
 
@@ -57,9 +90,14 @@ public class IPMonitoringService {
     public String getAllConfigurations(){
         StringBuffer sb = new StringBuffer();
         ipConfigs.values().forEach(x -> {
+            sb.append("[IP Address: ");
             sb.append(x.getIp());
-            sb.append(" ");
+            sb.append(", Configuration: ");
+            sb.append(x.getConfig());
+            sb.append("]\n");
         });
         return sb.toString();
     }
+
+
 }
