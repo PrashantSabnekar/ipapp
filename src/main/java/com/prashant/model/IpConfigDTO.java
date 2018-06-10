@@ -5,6 +5,7 @@ package com.prashant.model;
  **/
 public class IpConfigDTO {
     private String ip;
+    private String config;
 
     public String getIp() {
         return ip;
@@ -12,5 +13,13 @@ public class IpConfigDTO {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
     }
 }
